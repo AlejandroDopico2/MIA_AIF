@@ -1,0 +1,19 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Virtual environment
+.venv/
+venv/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# IDE (e.g., PyCharm) project settings
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignore local configuration files
+.env
