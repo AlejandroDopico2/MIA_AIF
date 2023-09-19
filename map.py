@@ -89,7 +89,7 @@ class Map:
 
     def update_position(self, position: Position, action: Action) -> tuple[Position, int]:
         """
-        Update the position of the robot according to the action. It is assumed that the action is valid.
+        Update the position of the robot according to the action. It the action is not valid, the cost is -1.
         :param position: position of the robot
         :param action: action to be performed
         :return: tuple with the new position and the cost of the action
@@ -101,6 +101,10 @@ class Map:
             new_y = position.y + ORIENTATION_TO_COORDINATES[position.orientation][1]
 
             new_position = Position(new_x, new_y, position.orientation)
+
+            if not self.is_position_valid(new_position):
+                return new_position, -1
+
             cost = self.matrix[new_x][new_y]
 
             return new_position, cost
@@ -120,3 +124,41 @@ class Map:
             cost = 1
 
             return new_position, cost
+
+    def is_position_valid(self, position: Position) -> bool:
+        """
+        Return True if the position is valid otherwise False.
+        :param position: position of the robot
+        :return: True if the position is within the map
+        """
+
+        return 0 <= position.x < len(self.matrix) and 0 <= position.y < len(self.matrix[0])
+
+    def get_actions(self, position: Position) -> List[Action]:
+        """
+        Return the list of valid actions for the given position.
+        :param position: position of the robot
+        :return: list of valid actions
+        """
+
+        actions = [Action.ROTATE_CLOCKWISE, Action.ROTATE_COUNTERCLOCKWISE]
+
+        possible_position, _ = self.update_position(position, Action.MOVE)
+
+        if self.is_position_valid(possible_position):
+            actions.append(Action.MOVE)
+
+        return actions
+
+    def is_finished(self, position: Position) -> bool:
+        """
+        Return True if the robot is in the end position otherwise False.
+        :param position: position of the robot
+        :return: True if the robot is in the end position
+        """
+        if self.end.orientation != Orientation.IRRELEVANT:
+            return position == self.end
+
+        return position.x == self.end.x and position.y == self.end.y
+
+
