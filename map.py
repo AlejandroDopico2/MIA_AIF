@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
+from typing import List
 
 
 class Orientation(Enum):
@@ -12,18 +13,51 @@ class Orientation(Enum):
     WEST = 6
     NORTHWEST = 7
     IRRELEVANT = 8
+
+
+ORIENTATION_TO_COORDINATES = {
+    Orientation.NORTH: (-1, 0),
+    Orientation.NORTHEAST: (-1, 1),
+    Orientation.EAST: (0, 1),
+    Orientation.SOUTHEAST: (1, 1),
+    Orientation.SOUTH: (1, 0),
+    Orientation.SOUTHWEST: (1, -1),
+    Orientation.WEST: (0, -1),
+    Orientation.NORTHWEST: (-1, -1),
+}
+
+
+class Action(Enum):
+    MOVE = 0
+    ROTATE_CLOCKWISE = 1
+    ROTATE_COUNTERCLOCKWISE = 2
+
+
 @dataclass
 class Position:
     x: int
     y: int
     orientation: Orientation = Orientation.IRRELEVANT
 
+
 class Map:
-    matrix: list[list[int]]
+
+    matrix: List[List[int]]
     start: Position
     end: Position
 
     def __init__(self, filename: str):
+        """
+        Create a map from a file. It is assumed that the file is in the following format:
+
+        - rows cols
+        - matrix (rows x cols)
+        - start_row start_col start_orientation
+        - end_row end_col end_orientation
+
+        :type filename: str
+        :param filename: name of the file that contains the map
+        """
 
         with open(filename, 'r') as f:
             lines = f.readlines()
@@ -34,9 +68,7 @@ class Map:
         self.matrix = [[0 for _ in range(cols)] for _ in range(rows)]
 
         for row in range(rows):
-
             for col, value in enumerate(lines[row].split()):
-
                 self.matrix[row][col] = int(value)
 
         lines = lines[rows:]
@@ -55,11 +87,36 @@ class Map:
 
         return string
 
+    def update_position(self, position: Position, action: Action) -> tuple[Position, int]:
+        """
+        Update the position of the robot according to the action. It is assumed that the action is valid.
+        :param position: position of the robot
+        :param action: action to be performed
+        :return: tuple with the new position and the cost of the action
+        """
 
+        if action == Action.MOVE:
 
+            new_x = position.x + ORIENTATION_TO_COORDINATES[position.orientation][0]
+            new_y = position.y + ORIENTATION_TO_COORDINATES[position.orientation][1]
 
+            new_position = Position(new_x, new_y, position.orientation)
+            cost = self.matrix[new_x][new_y]
 
+            return new_position, cost
 
+        if action == Action.ROTATE_CLOCKWISE:
 
+            new_orientation = Orientation((position.orientation.value + 1) % 8)
+            new_position = Position(position.x, position.y, new_orientation)
+            cost = 1
 
+            return new_position, cost
 
+        if action == Action.ROTATE_COUNTERCLOCKWISE:
+
+            new_orientation = Orientation((position.orientation.value - 1) % 8)
+            new_position = Position(position.x, position.y, new_orientation)
+            cost = 1
+
+            return new_position, cost

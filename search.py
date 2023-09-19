@@ -1,6 +1,6 @@
 from enum import Enum
 
-from map import Map
+from map import Map, Action
 
 
 class Algorithm(Enum):
@@ -35,6 +35,28 @@ def main():
     map = Map(args.file)
 
     print(map)
+
+    position = map.start
+    print(position)
+    position, _ = map.update_position(position, Action.ROTATE_COUNTERCLOCKWISE)
+    print(position)
+    position, _ = map.update_position(position, Action.ROTATE_CLOCKWISE)
+    print(position)
+    position, _ = map.update_position(position, Action.ROTATE_CLOCKWISE)
+    print(position)
+    position, _ = map.update_position(position, Action.ROTATE_CLOCKWISE)
+    print(position)
+    position, _ = map.update_position(position, Action.ROTATE_CLOCKWISE)
+    print(position)
+    position, _ = map.update_position(position, Action.MOVE)
+    print(position)
+    position, _ = map.update_position(position, Action.MOVE)
+    print(position)
+    position, _ = map.update_position(position, Action.ROTATE_COUNTERCLOCKWISE)
+    print(position)
+    position, _ = map.update_position(position, Action.MOVE)
+    print(position)
+    print(map.end)
 
 if __name__ == '__main__':
     main()
