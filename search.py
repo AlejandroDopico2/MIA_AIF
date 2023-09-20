@@ -1,11 +1,14 @@
 from enum import Enum
 
-from map import Map, Action
+from map import Map
 
+import algorithms
+
+import time
 
 class Algorithm(Enum):
-    BFS = "BFS"
-    DFS = "DFS"
+    BFS = algorithms.breadth_first_search
+    DFS = algorithms.depth_first_search
     A1 = "A*(h1)"
     A2 = "A*(h2)"
 
@@ -33,30 +36,35 @@ def main():
     algorithm = ALGORITHMS[args.algorithm]
 
     map = Map(args.file)
+    time_start = time.perf_counter()
+    algorithm(map)
+    time_end = time.perf_counter()
 
-    print(map)
+    print(f"Time was {time_end - time_start}")
 
-    position = map.start
-    print(position)
-    position, _ = map.update_position(position, Action.ROTATE_COUNTERCLOCKWISE)
-    print(position)
-    position, _ = map.update_position(position, Action.ROTATE_CLOCKWISE)
-    print(position)
-    position, _ = map.update_position(position, Action.ROTATE_CLOCKWISE)
-    print(position)
-    position, _ = map.update_position(position, Action.ROTATE_CLOCKWISE)
-    print(position)
-    position, _ = map.update_position(position, Action.ROTATE_CLOCKWISE)
-    print(position)
-    position, _ = map.update_position(position, Action.MOVE)
-    print(position)
-    position, _ = map.update_position(position, Action.MOVE)
-    print(position)
-    position, _ = map.update_position(position, Action.ROTATE_COUNTERCLOCKWISE)
-    print(position)
-    position, _ = map.update_position(position, Action.MOVE)
-    print(position)
-    print(map.end)
+    # TODO: Needed or only for debug ?
+
+    # position = map.start
+    # print(position)
+    # position, _ = map.update_position(position, Action.ROTATE_COUNTERCLOCKWISE)
+    # print(position)
+    # position, _ = map.update_position(position, Action.ROTATE_CLOCKWISE)
+    # print(position)
+    # position, _ = map.update_position(position, Action.ROTATE_CLOCKWISE)
+    # print(position)
+    # position, _ = map.update_position(position, Action.ROTATE_CLOCKWISE)
+    # print(position)
+    # position, _ = map.update_position(position, Action.ROTATE_CLOCKWISE)
+    # print(position)
+    # position, _ = map.update_position(position, Action.MOVE)
+    # print(position)
+    # position, _ = map.update_position(position, Action.MOVE)
+    # print(position)
+    # position, _ = map.update_position(position, Action.ROTATE_COUNTERCLOCKWISE)
+    # print(position)
+    # position, _ = map.update_position(position, Action.MOVE)
+    # print(position)
+    # print(map.end)
 
 if __name__ == '__main__':
     main()

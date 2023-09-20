@@ -39,6 +39,8 @@ class Position:
     y: int
     orientation: Orientation = Orientation.IRRELEVANT
 
+    def __hash__(self) -> int:
+        return hash((self.x, self.y, self.orientation))
 
 class Map:
 
