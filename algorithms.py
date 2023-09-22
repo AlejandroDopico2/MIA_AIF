@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from collections import deque
 from typing import Optional
+from queue import PriorityQueue
 
 from map import Action, Map, Position
 
@@ -14,10 +15,13 @@ class Node:
 
     def __hash__(self):
         return hash(self.state)
-    
+
     def __str__(self):
         return f"Node(state={self.state}, parent={self.parent.state}, cost={self.cost})"
     
+    def __lt__(self, obj):
+        return self.cost < obj.cost
+
     def expand(self, problem: Map):
         s = self.state
         nodes = []
@@ -34,7 +38,7 @@ def breadth_first_search(problem: Map) -> Node:
 
     if problem.is_finished(node.state):
         return node
-    
+
     frontier = deque([node])
     reached = [problem.start]
 
@@ -50,7 +54,6 @@ def breadth_first_search(problem: Map) -> Node:
 
     return -1
 
-    
 def depth_first_search(problem: Map) -> Node:
     node = Node(problem.start, None, None, 0)
 
@@ -64,5 +67,37 @@ def depth_first_search(problem: Map) -> Node:
         reached.append(node)
         frontier.extend(child for child in node.expand(problem)
                         if child.state not in reached and child not in frontier)
-        
+
     return -1
+
+def best_first_search(problem: Map, h) -> Node:
+    node = Node(problem.start, None, None, 0)
+    frontier = PriorityQueue()
+    frontier.put((f(node, h), node))
+    reached = {problem.start : node}
+
+    while not(frontier.empty()):
+        node = frontier.get()[1]
+        if problem.is_finished(node.state):
+            return node
+        for child in node.expand(problem):
+            s = child.state
+            if (not(s in reached) or (child.cost < reached[s].cost)):
+                reached[s] = child
+                frontier.put((f(child, h), child))
+    return -1
+
+def f(node: Node, h):
+    return node.cost + h(node)
+
+def h1(node: Node):
+    return 0
+
+def h2(node: Node):
+    return 0
+
+def aStar_search_h1(problem: Map) -> Node:
+    return best_first_search(problem, h1)
+
+def aStar_search_h2(problem: Map) -> Node:
+    return best_first_search(problem, h2)

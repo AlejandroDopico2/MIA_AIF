@@ -9,8 +9,8 @@ import time
 class Algorithm(Enum):
     BFS = algorithms.breadth_first_search
     DFS = algorithms.depth_first_search
-    A1 = "A*(h1)"
-    A2 = "A*(h2)"
+    A1 = algorithms.aStar_search_h1
+    A2 = algorithms.aStar_search_h2
 
 ALGORITHMS = {
     "BFS": Algorithm.BFS,
