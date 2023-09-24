@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List, Callable
 
 from map import Map
 
@@ -22,6 +23,69 @@ ALGORITHMS = {
 }
 
 
+def get_path(node: algorithms.Node) -> List[algorithms.Node]:
+    """
+    Get the path from the root node to the given node.
+    :param node: the node to get the path to.
+    :return: the path from the root node to the given node.
+    """
+    path = []
+
+    while node.parent is not None:
+        path.append(node)
+        node = node.parent
+
+    path.append(node)
+    return path[::-1]
+
+
+def show_solution(solution: algorithms.Node, problem: Map, nodes_explored: int, nodes_frontier: int, is_informed: bool):
+    """
+    Show the solution to the problem and the number of nodes explored and in the frontier. If there is no solution
+    prints a message indicating that.
+    :param solution: the node that is the solution to the problem.
+    :param problem: the map to solve.
+    :param nodes_explored: number of nodes explored.
+    :param nodes_frontier: number of nodes in the frontier.
+    :param is_informed: True if the algorithm is informed otherwise False. Used to show the heuristic value.
+    """
+    if not problem.is_finished(solution.state):
+        print('No solution found')
+        print("Showing last path explored")
+
+    path = get_path(solution)
+
+    for i, node in enumerate(path):
+
+        if i != 0:
+            print(f"Action: {node.action.name}")
+
+        if is_informed:
+            print(f"({i}, {node.cost}, {node.heuristic_value}, {node.state})")
+        else:
+            print(f"({i}, {node.cost}, {node.state})")
+
+    print(f"\nTotal number of nodes explored: {nodes_explored}")
+    print(f"Total number of nodes in the frontier: {nodes_frontier}")
+
+
+def wrapper_time(func: Callable):
+    """
+    Wrapper to measure the time of a function.
+    :param func: function to measure the time.
+    :return: the result of the function.
+    """
+    def wrapper(*args, **kwargs):
+
+        time_start = time.perf_counter()
+        result = func(*args, **kwargs)
+        time_end = time.perf_counter()
+        print(f"Time take by the function {func.__name__} is {time_end - time_start}")
+        return result
+
+    return wrapper
+
+
 def main():
     import argparse
 
@@ -36,38 +100,14 @@ def main():
         print('Invalid algorithm')
         return
 
-    algorithm = ALGORITHMS[args.algorithm]
+    algorithm_function = wrapper_time(ALGORITHMS[args.algorithm])
 
-    map = Map(args.file)
-    time_start = time.perf_counter()
-    solution = algorithm(map)
-    time_end = time.perf_counter()
+    problem = Map(args.file)
 
-    print(f"Time was {time_end - time_start}")
+    solution, nodes_explored, nodes_frontier = algorithm_function(problem)
 
-    # TODO: Needed or only for debug ?
-
-    # position = map.start
-    # print(position)
-    # position, _ = map.update_position(position, Action.ROTATE_COUNTERCLOCKWISE)
-    # print(position)
-    # position, _ = map.update_position(position, Action.ROTATE_CLOCKWISE)
-    # print(position)
-    # position, _ = map.update_position(position, Action.ROTATE_CLOCKWISE)
-    # print(position)
-    # position, _ = map.update_position(position, Action.ROTATE_CLOCKWISE)
-    # print(position)
-    # position, _ = map.update_position(position, Action.ROTATE_CLOCKWISE)
-    # print(position)
-    # position, _ = map.update_position(position, Action.MOVE)
-    # print(position)
-    # position, _ = map.update_position(position, Action.MOVE)
-    # print(position)
-    # position, _ = map.update_position(position, Action.ROTATE_COUNTERCLOCKWISE)
-    # print(position)
-    # position, _ = map.update_position(position, Action.MOVE)
-    # print(position)
-    # print(map.end)
+    is_informed = args.algorithm in [Algorithm.A1, Algorithm.A2]
+    show_solution(solution, problem, nodes_explored, nodes_frontier, is_informed)
 
 
 if __name__ == '__main__':

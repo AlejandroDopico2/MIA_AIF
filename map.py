@@ -180,7 +180,7 @@ class Map:
         :param position: position of the robot
         :return: Chebyshev distance to the end position
         """
-        return max(abs(position.x - self.end.x), abs(position.y - self.end.y))
+        return 5*max(abs(position.x - self.end.x), abs(position.y - self.end.y))
 
     def angle_distance(self, position: Position) -> float:
         """
@@ -194,6 +194,9 @@ class Map:
         dot_product = vector_positions[0] * vector_orientation[0] + vector_positions[1] * vector_orientation[1]
         norm_positions = math.sqrt(vector_positions[0] ** 2 + vector_positions[1] ** 2)
         norm_orientation = math.sqrt(vector_orientation[0] ** 2 + vector_orientation[1] ** 2)
+
+        if norm_positions == 0:
+            return 0
 
         cosine = dot_product / (norm_positions * norm_orientation)
         cosine = min(1.0, max(-1.0, cosine))
