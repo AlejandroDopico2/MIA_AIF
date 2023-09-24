@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 from enum import Enum
 from typing import List
@@ -27,6 +28,18 @@ ORIENTATION_TO_COORDINATES = {
 }
 
 
+ORIENTATION_TO_RADIANT = {
+    Orientation.EAST: 0,
+    Orientation.NORTHEAST: math.pi / 4,
+    Orientation.NORTH: math.pi / 2,
+    Orientation.NORTHWEST: 3 * math.pi / 4,
+    Orientation.WEST: math.pi,
+    Orientation.SOUTHWEST: 5 * math.pi / 4,
+    Orientation.SOUTH: 3 * math.pi / 2,
+    Orientation.SOUTHEAST: 7 * math.pi / 4,
+}
+
+
 class Action(Enum):
     MOVE = 0
     ROTATE_CLOCKWISE = 1
@@ -42,8 +55,8 @@ class Position:
     def __hash__(self) -> int:
         return hash((self.x, self.y, self.orientation))
 
-class Map:
 
+class Map:
     matrix: List[List[int]]
     start: Position
     end: Position
@@ -112,7 +125,6 @@ class Map:
             return new_position, cost
 
         if action == Action.ROTATE_CLOCKWISE:
-
             new_orientation = Orientation((position.orientation.value + 1) % 8)
             new_position = Position(position.x, position.y, new_orientation)
             cost = 1
@@ -120,7 +132,6 @@ class Map:
             return new_position, cost
 
         if action == Action.ROTATE_COUNTERCLOCKWISE:
-
             new_orientation = Orientation((position.orientation.value - 1) % 8)
             new_position = Position(position.x, position.y, new_orientation)
             cost = 1
@@ -163,4 +174,45 @@ class Map:
 
         return position.x == self.end.x and position.y == self.end.y
 
+    def distance_chebyshev(self, position: Position) -> int:
+        """
+        Return the Chebyshev distance from the given position to the end position.
+        :param position: position of the robot
+        :return: Chebyshev distance to the end position
+        """
+        return max(abs(position.x - self.end.x), abs(position.y - self.end.y))
 
+    def angle_distance(self, position: Position) -> float:
+        """
+        Return the distance between the angle formed with the end and the orientation of the robot.
+        :param position: position of the robot
+        :return: angle distance between the end and the orientation of the robot
+        """
+        vector_positions = (self.end.x - position.x, self.end.y - position.y)
+        vector_orientation = ORIENTATION_TO_COORDINATES[position.orientation]
+
+        dot_product = vector_positions[0] * vector_orientation[0] + vector_positions[1] * vector_orientation[1]
+        norm_positions = math.sqrt(vector_positions[0] ** 2 + vector_positions[1] ** 2)
+        norm_orientation = math.sqrt(vector_orientation[0] ** 2 + vector_orientation[1] ** 2)
+
+        cosine = dot_product / (norm_positions * norm_orientation)
+        cosine = min(1.0, max(-1.0, cosine))
+
+        return math.acos(cosine)
+
+    def heuristic_1(self, position: Position):
+        """
+        Return the heuristic value for the given position. This heuristic is the Chebyshev distance to the end
+        :param position: position of the robot
+        :return: heuristic value
+        """
+        return self.distance_chebyshev(position)
+
+    def heuristic_2(self, position: Position):
+        """
+        Return the heuristic value for the given position. This heuristic is the Chebyshev distance to the end plus
+        the angle distance to the end and the orientation of the robot.
+        :param position: position of the robot
+        :return: heuristic value
+        """
+        return self.distance_chebyshev(position) + self.angle_distance(position)

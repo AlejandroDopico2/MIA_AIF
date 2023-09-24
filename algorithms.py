@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from collections import deque
-from typing import Optional
+from typing import Optional, Callable
 from queue import PriorityQueue
 
 from map import Action, Map, Position
@@ -18,11 +18,16 @@ class Node:
 
     def __str__(self):
         return f"Node(state={self.state}, parent={self.parent.state}, cost={self.cost})"
-    
+
     def __lt__(self, obj):
         return self.cost < obj.cost
 
-    def expand(self, problem: Map):
+    def expand(self, problem: Map) -> list['Node']:
+        """
+        Expand the node, generating all the possible children
+        :param problem: map to solve
+        :return: list of nodes that are children of the current node
+        """
         s = self.state
         nodes = []
 
@@ -33,7 +38,13 @@ class Node:
         return nodes
 
 
-def breadth_first_search(problem: Map) -> Node:
+def breadth_first_search(problem: Map) -> Optional[Node]:
+    """
+    Breadth-first search algorithm
+    :param problem: map to solve
+    :return: solution node (using its parents recursively the path can be generated) or None if no solution was found
+    """
+
     node = Node(problem.start, None, None, 0)
 
     if problem.is_finished(node.state):
@@ -52,9 +63,16 @@ def breadth_first_search(problem: Map) -> Node:
                 reached.append(s)
                 frontier.append(child)
 
-    return -1
+    return None
 
-def depth_first_search(problem: Map) -> Node:
+
+def depth_first_search(problem: Map) -> Optional[Node]:
+    """
+    Depth-first search algorithm
+    :param problem: map to solve
+    :return: solution node (using its parents recursively the path can be generated) or None if no solution was found
+    """
+
     node = Node(problem.start, None, None, 0)
 
     frontier = [node]
@@ -68,36 +86,55 @@ def depth_first_search(problem: Map) -> Node:
         frontier.extend(child for child in node.expand(problem)
                         if child.state not in reached and child not in frontier)
 
-    return -1
+    return None
 
-def best_first_search(problem: Map, h) -> Node:
+
+def a_star_search(problem: Map, heuristic: Callable[[Position], float]) -> Optional[Node]:
+    """
+    A* search algorithm in the given problem using the heuristic provided
+    :param problem: map to solve
+    :param heuristic: heuristic function to use (takes a position and returns an integer)
+    :return: solution node (using its parents recursively the path can be generated) or None if no solution was found
+    """
+
+    function = lambda n: n.cost + heuristic(n.state)
+
     node = Node(problem.start, None, None, 0)
-    frontier = PriorityQueue()
-    frontier.put((f(node, h), node))
-    reached = {problem.start : node}
 
-    while not(frontier.empty()):
+    frontier = PriorityQueue()
+    frontier.put((function(node), node))
+
+    reached = {problem.start: 0}
+
+    while not (frontier.empty()):
         node = frontier.get()[1]
+
         if problem.is_finished(node.state):
             return node
+
         for child in node.expand(problem):
             s = child.state
-            if (not(s in reached) or (child.cost < reached[s].cost)):
+
+            if not (s in reached) or (child.cost < reached[s]):
                 reached[s] = child
-                frontier.put((f(child, h), child))
-    return -1
+                frontier.put((function(child), child))
 
-def f(node: Node, h):
-    return node.cost + h(node)
+    return None
 
-def h1(node: Node):
-    return 0
 
-def h2(node: Node):
-    return 0
+def a_star_search_h1(problem: Map) -> Node:
+    """
+    A* search algorithm in the given problem using the Chebyshev distance as heuristic
+    :param problem: map to solve
+    :return: solution node (using its parents recursively the path can be generated) or None if no solution was found
+    """
+    return a_star_search(problem, problem.heuristic_1)
 
-def aStar_search_h1(problem: Map) -> Node:
-    return best_first_search(problem, h1)
 
-def aStar_search_h2(problem: Map) -> Node:
-    return best_first_search(problem, h2)
+def a_star_search_h2(problem: Map) -> Node:
+    """
+    A* search algorithm in the given problem using the Chebyshev distance plus the angle distance as heuristic
+    :param problem: map to solve
+    :return: solution node (using its parents recursively the path can be generated) or None if no solution was found
+    """
+    return a_star_search(problem, problem.heuristic_2)
