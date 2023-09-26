@@ -41,8 +41,8 @@ def get_path(node: algorithms.Node) -> List[algorithms.Node]:
 
 def show_solution(solution: algorithms.Node, problem: Map, nodes_explored: int, nodes_frontier: int, is_informed: bool):
     """
-    Show the solution to the problem and the number of nodes explored and in the frontier. If there is no solution
-    prints a message indicating that.
+    Show the solution to the problem and the number of nodes explored and in the frontier.
+    If there is no solution prints a message indicating that.
     :param solution: the node that is the solution to the problem.
     :param problem: the map to solve.
     :param nodes_explored: number of nodes explored.
