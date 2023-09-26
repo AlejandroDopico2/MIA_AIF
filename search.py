@@ -18,8 +18,8 @@ class Algorithm(Enum):
 ALGORITHMS = {
     "BFS": Algorithm.BFS,
     "DFS": Algorithm.DFS,
-    "A*(h1)": Algorithm.A1,
-    "A*(h2)": Algorithm.A2
+    "A1": Algorithm.A1,
+    "A2": Algorithm.A2
 }
 
 
