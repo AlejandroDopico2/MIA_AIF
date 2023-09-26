@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from collections import deque
-from typing import Optional, Callable, Tuple
+from typing import Optional, Callable, Tuple, List
 from queue import PriorityQueue
 
 from map import Action, Map, Position
@@ -35,7 +35,7 @@ class Node:
     def __lt__(self, obj):
         return self.cost < obj.cost
 
-    def expand(self, problem: Map) -> list['Node']:
+    def expand(self, problem: Map) -> List['Node']:
         """
         Expand the node, generating all the possible children
         :param problem: map to solve

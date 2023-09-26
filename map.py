@@ -1,7 +1,7 @@
 import math
 from dataclasses import dataclass
 from enum import Enum
-from typing import List
+from typing import List, Tuple
 
 
 class Orientation(Enum):
@@ -55,6 +55,9 @@ class Position:
     def __hash__(self) -> int:
         return hash((self.x, self.y, self.orientation))
 
+    def __str__(self) -> str:
+        return f"Position (x: {self.x}, y: {self.y}, orientation: {self.orientation.name} ({self.orientation.value}))"
+
 
 class Map:
     matrix: List[List[int]]
@@ -102,7 +105,7 @@ class Map:
 
         return string
 
-    def update_position(self, position: Position, action: Action) -> tuple[Position, int]:
+    def update_position(self, position: Position, action: Action) -> Tuple[Position, int]:
         """
         Update the position of the robot according to the action. It the action is not valid, the cost is -1.
         :param position: position of the robot
