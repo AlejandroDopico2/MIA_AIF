@@ -61,9 +61,9 @@ def show_solution(solution: algorithms.Node, problem: Map, nodes_explored: int, 
             print(f"Action: {node.action.name}")
 
         if is_informed:
-            print(f"({i}, {node.cost}, {node.heuristic_value}, {node.state})")
+            print(f"({i}, {node.cost}, {node.action}, {node.heuristic_value}, {node.state})")
         else:
-            print(f"({i}, {node.cost}, {node.state})")
+            print(f"({i}, {node.cost}, {node.action}, {node.state})")
 
     print(f"\nTotal number of nodes explored: {nodes_explored}")
     print(f"Total number of nodes in the frontier: {nodes_frontier}")
